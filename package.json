@@ -1,6 +1,7 @@
 {
   "name": "zmh-portfolio",
   "version": "1.0.0",
+  "homepage": "https://zunm3133.github.io/portfolio/",
   "type": "module",
   "scripts": {
     "dev": "vite",
