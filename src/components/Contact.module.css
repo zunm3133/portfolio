@@ -137,3 +137,33 @@
   .inner { grid-template-columns: 1fr; gap: 3rem; }
   .row { grid-template-columns: 1fr; }
 }
+/* Status button styles */
+.submit.sending {
+  background: var(--text-light);
+  cursor: not-allowed;
+}
+.submit.sent {
+  background: var(--accent);
+}
+.submit.error {
+  background: #8B3A3A;
+}
+
+/* Spinner */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.spinner {
+  animation: spin 0.8s linear infinite;
+}
+
+/* Error note */
+.errorNote {
+  font-size: 0.8rem;
+  color: #8B3A3A;
+  font-family: var(--mono);
+}
+.errorNote a {
+  color: inherit;
+  text-decoration: underline;
+}

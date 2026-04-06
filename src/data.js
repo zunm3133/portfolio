@@ -52,6 +52,7 @@ export const education = [
 export const certifications = [
   { name: 'Google Data Analytics Specialization', issuer: 'Google', year: '2023' },
   { name: 'Google Business Intelligence Specialization', issuer: 'Google', year: '2024' },
+  { name: 'Google Cybersecurity Specialization', issuer: 'Google', year: '2024' },
   { name: 'IBM Data Science Specialization', issuer: 'IBM', year: '2024' },
 ]
 

@@ -56,7 +56,7 @@ export default function Hero() {
           </div>
           <div className={styles.statDivider} />
           <div className={styles.stat}>
-            <span className={styles.statNum}>3</span>
+            <span className={styles.statNum}>4</span>
             <span className={styles.statLabel}>Certifications</span>
           </div>
         </div>
