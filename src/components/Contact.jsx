@@ -1,20 +1,37 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
+import emailjs from '@emailjs/browser'
 import { useReveal } from '../hooks/useReveal'
 import { personal } from '../data'
 import styles from './Contact.module.css'
 
+const SERVICE_ID  = 'service_yne4x68'
+const TEMPLATE_ID = 'template_j8p0wd8'  
+const PUBLIC_KEY  = 'hAmVBF-BzMV_5X5G6' 
+
 export default function Contact() {
   const [ref, visible] = useReveal()
-  const [sent, setSent] = useState(false)
+  const formRef = useRef(null)
+
+  const [status, setStatus] = useState('idle') 
   const [form, setForm] = useState({ name: '', email: '', message: '' })
 
-  const handleChange = e => setForm(f => ({ ...f, [e.target.name]: e.target.value }))
+  const handleChange = e =>
+    setForm(f => ({ ...f, [e.target.name]: e.target.value }))
 
-  const handleSubmit = e => {
+  const handleSubmit = async e => {
     e.preventDefault()
-    setSent(true)
-    setForm({ name: '', email: '', message: '' })
-    setTimeout(() => setSent(false), 4000)
+    setStatus('sending')
+
+    try {
+      await emailjs.sendForm(SERVICE_ID, TEMPLATE_ID, formRef.current, PUBLIC_KEY)
+      setStatus('sent')
+      setForm({ name: '', email: '', message: '' })
+      setTimeout(() => setStatus('idle'), 5000)
+    } catch (err) {
+      console.error('EmailJS error:', err)
+      setStatus('error')
+      setTimeout(() => setStatus('idle'), 4000)
+    }
   }
 
   return (
@@ -24,7 +41,9 @@ export default function Contact() {
           <p className={styles.sectionLabel}>Contact</p>
           <h2 className={styles.heading}>Let's work<br />together.</h2>
           <p className={styles.body}>
-            I'm open to Data Analyst and Developer roles. Whether you have a position, a project, or just want to talk data — I'd genuinely enjoy the conversation.
+            I'm open to Data Analyst and Developer roles. Whether you have a
+            position, a project, or just want to talk data — I'd genuinely
+            enjoy the conversation.
           </p>
 
           <div className={styles.contactItems}>
@@ -61,25 +80,26 @@ export default function Contact() {
               </div>
               <div>
                 <div className={styles.contactLabel}>GitHub</div>
-                <div className={styles.contactVal}>github.com/zunmyathsu</div>
+                <div className={styles.contactVal}>github.com/zunm3133</div>
               </div>
             </a>
           </div>
         </div>
 
         <div className={styles.right}>
-          <form className={styles.form} onSubmit={handleSubmit}>
+          <form ref={formRef} className={styles.form} onSubmit={handleSubmit}>
             <div className={styles.row}>
               <div className={styles.field}>
                 <label className={styles.label}>Name</label>
                 <input
                   className={styles.input}
                   type="text"
-                  name="name"
+                  name="from_name"
                   value={form.name}
-                  onChange={handleChange}
+                  onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                   placeholder="Your name"
                   required
+                  disabled={status === 'sending'}
                 />
               </div>
               <div className={styles.field}>
@@ -87,11 +107,12 @@ export default function Contact() {
                 <input
                   className={styles.input}
                   type="email"
-                  name="email"
+                  name="from_email"
                   value={form.email}
-                  onChange={handleChange}
+                  onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
                   placeholder="your@email.com"
                   required
+                  disabled={status === 'sending'}
                 />
               </div>
             </div>
@@ -101,24 +122,46 @@ export default function Contact() {
                 className={styles.textarea}
                 name="message"
                 value={form.message}
-                onChange={handleChange}
+                onChange={e => setForm(f => ({ ...f, message: e.target.value }))}
                 placeholder="Tell me about the role or project..."
                 required
+                disabled={status === 'sending'}
               />
             </div>
-            <button type="submit" className={`${styles.submit} ${sent ? styles.sent : ''}`}>
-              {sent ? (
-                <>
-                  <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-                  Message sent!
-                </>
-              ) : (
-                <>
-                  Send Message
+
+            <button
+              type="submit"
+              className={`${styles.submit} ${styles[status]}`}
+              disabled={status === 'sending'}
+            >
+              {status === 'idle' && (
+                <>Send Message
                   <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
                 </>
               )}
+              {status === 'sending' && (
+                <>Sending...
+                  <svg className={styles.spinner} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" strokeOpacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10" /></svg>
+                </>
+              )}
+              {status === 'sent' && (
+                <>Message sent!
+                  <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                </>
+              )}
+              {status === 'error' && (
+                <>Failed — try again
+                  <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                </>
+              )}
             </button>
+
+            {status === 'error' && (
+              <p className={styles.errorNote}>
+                Something went wrong. You can also email directly at{' '}
+                <a href={`mailto:${personal.email}`}>{personal.email}</a>
+              </p>
+            )}
           </form>
         </div>
       </div>
